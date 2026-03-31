@@ -331,8 +331,13 @@ const SCHEME_GID = '99945594';  // GID of the 'Schemes' tab
 <script>
 // ── helpers ──────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
+// Uses Google Visualization API — works cross-origin without CORS issues
 const csvUrl = gid =>
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&tq=select+*`;
+
+// Fetch via no-cors workaround using allorigins proxy
+const proxyUrl = url =>
+  `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
 function setStatus(state, msg) {
   const dot  = $('sdot');
@@ -472,13 +477,15 @@ async function loadAll() {
 
   try {
     const [grRes, scRes] = await Promise.all([
-      fetch(csvUrl(GR_GID)),
-      fetch(csvUrl(SCHEME_GID))
+      fetch(proxyUrl(csvUrl(GR_GID))),
+      fetch(proxyUrl(csvUrl(SCHEME_GID)))
     ]);
 
     if (!grRes.ok || !scRes.ok) throw new Error('Fetch failed');
 
-    const [grText, scText] = await Promise.all([grRes.text(), scRes.text()]);
+    const grJson = await grRes.json();
+    const scJson = await scRes.json();
+    const [grText, scText] = [grJson.contents, scJson.contents];
     const grRows = parseCSV(grText);
     const scRows = parseCSV(scText);
 
