@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gujarat IP 2020 — Live Scheme Navigator</title>
+<style>
+/* ── CONFIGURATION NOTE ────────────────────────────────────────────
+   Replace 1M9Eh9YabtN-ap7eSLOluyeiaEHY1k1Sh with your Google Sheet ID
+   Replace GR_GID and SCHEME_GID with the actual tab GIDs
+   (visible in the URL when each tab is open in Google Sheets)
+──────────────────────────────────────────────────────────────────── */
+
+:root {
+  --orange:#e85d04; --orange-dk:#c0390b;
+  --navy:#1a3a5c;   --navy-lt:#1f6ca8;
+  --teal:#0d7377;   --green:#1a7a4a;
+  --purple:#5c2d91; --gray:#f4f5f7;
+  --border:#dde2e8; --text:#1c2b3a; --muted:#5a6a7a;
+  --white:#ffffff;  --shadow:0 2px 8px rgba(0,0,0,.10);
+  --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;background:#eef1f5;color:var(--text);}
+
+/* header */
+.site-header{background:linear-gradient(135deg,#1a2f4a,#1a5276 60%,#1a6ca8);box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid rgba(255,255,255,.1);}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-dk));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.logo-text h1{color:#fff;font-size:16px;font-weight:700;line-height:1.2;}
+.logo-text p{color:#aed6f1;font-size:11px;}
+.hlinks{display:flex;gap:6px;flex-wrap:wrap;}
+.hlink{color:#aed6f1;font-size:11px;text-decoration:none;padding:3px 8px;border:1px solid rgba(174,214,241,.3);border-radius:3px;transition:all .2s;}
+.hlink:hover{background:rgba(255,255,255,.1);color:#fff;}
+.breadcrumb{background:rgba(0,0,0,.15);padding:7px 20px;font-size:11.5px;color:#aed6f1;display:flex;align-items:center;gap:6px;}
+.breadcrumb a{color:#aed6f1;text-decoration:none;} .breadcrumb a:hover{color:#fff;}
+.breadcrumb span{color:#fff;font-weight:600;}
+
+/* status bar */
+.status-bar{background:#fff;border-bottom:1px solid var(--border);padding:6px 20px;display:flex;align-items:center;gap:12px;font-size:11.5px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0;}
+.status-dot.loading{background:#f59e0b;animation:pulse 1s infinite;}
+.status-dot.ok{background:#22c55e;}
+.status-dot.err{background:#ef4444;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-text{color:var(--muted);}
+.last-updated{margin-left:auto;color:var(--muted);}
+.refresh-btn{background:var(--navy);color:#fff;border:none;padding:3px 10px;border-radius:3px;font-size:11px;cursor:pointer;}
+.refresh-btn:hover{background:var(--navy-lt);}
+
+/* tabs */
+.tab-nav{background:var(--navy);display:flex;gap:0;padding:0 20px;border-bottom:3px solid var(--orange);}
+.tab-btn{padding:11px 20px;color:#aed6f1;font-size:12.5px;font-weight:600;cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;white-space:nowrap;}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.06);}
+.tab-btn.active{color:#fff;border-bottom-color:var(--orange);background:rgba(232,93,4,.15);}
+.tab-badge{display:inline-block;background:var(--orange);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:5px;vertical-align:middle;}
+
+/* layout */
+.page{display:flex;gap:14px;padding:14px 20px;max-width:1300px;margin:0 auto;}
+.content{flex:1;min-width:0;}
+.sidebar{width:210px;flex-shrink:0;}
+
+/* controls */
+.controls{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.ctrl-btn{background:var(--navy);color:#fff;border:none;padding:5px 13px;font-size:11.5px;border-radius:3px;cursor:pointer;transition:background .2s;}
+.ctrl-btn:hover{background:var(--navy-lt);}
+.ctrl-btn.orange{background:var(--orange);}
+.ctrl-btn.orange:hover{background:var(--orange-dk);}
+.search-box{flex:1;min-width:160px;max-width:280px;border:1px solid var(--border);border-radius:3px;padding:5px 10px;font-size:12px;outline:none;}
+.search-box:focus{border-color:var(--navy-lt);}
+.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:10px 0 5px;padding-left:2px;}
+
+/* accordion */
+.acc-item{margin-bottom:4px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.acc-head{display:flex;align-items:center;gap:10px;background:var(--orange);color:#fff;padding:9px 14px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;user-select:none;transition:background .15s;}
+.acc-head:hover{background:var(--orange-dk);}
+.acc-head.navy{background:var(--navy);} .acc-head.navy:hover{background:#1a2f4a;}
+.acc-head.teal{background:var(--teal);} .acc-head.teal:hover{background:#0a5c60;}
+.acc-head.green{background:var(--green);} .acc-head.green:hover{background:#155e38;}
+.acc-head.purple{background:var(--purple);} .acc-head.purple:hover{background:#451f6e;}
+.acc-icon{font-size:15px;flex-shrink:0;transition:transform .2s;}
+.acc-icon.open{transform:rotate(90deg);}
+.acc-title{flex:1;}
+.acc-src{font-size:9.5px;font-weight:400;background:rgba(255,255,255,.2);padding:2px 7px;border-radius:10px;white-space:nowrap;}
+.acc-body{display:none;background:var(--white);border:1px solid var(--border);border-top:none;}
+.acc-body.open{display:block;}
+
+/* GR table */
+.gr-wrap{overflow-x:auto;}
+table.gr{width:100%;border-collapse:collapse;font-size:11.5px;}
+table.gr thead tr{background:var(--navy);}
+table.gr thead th{padding:8px 10px;color:#fff;font-weight:700;text-align:center;border:1px solid #2a4a6a;}
+table.gr tbody tr{border-bottom:1px solid #edf0f3;transition:background .1s;}
+table.gr tbody tr:nth-child(even){background:#f7f9fc;}
+table.gr tbody tr:hover{background:#e8f0fb;}
+table.gr td{padding:6px 10px;vertical-align:middle;border:1px solid #edf0f3;}
+.td-sr{text-align:center;font-weight:700;color:#888;width:32px;}
+.td-dt{white-space:nowrap;color:#666;text-align:center;width:85px;font-size:11px;}
+.td-gr{font-family:'Courier New',monospace;font-size:10.5px;color:var(--navy);width:175px;}
+.td-sb{color:var(--text);line-height:1.4;}
+.td-pd{text-align:center;width:60px;}
+.pdf-btn{display:inline-flex;align-items:center;justify-content:center;background:#c0392b;color:#fff;border-radius:3px;width:32px;height:32px;text-decoration:none;font-size:9px;font-weight:800;letter-spacing:.5px;transition:background .2s;}
+.pdf-btn:hover{background:#96281b;}
+.new-badge{display:inline-block;background:#27ae60;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;margin-left:5px;}
+.merged-badge{display:inline-block;background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;margin-left:5px;vertical-align:middle;}
+
+/* sub items */
+.sub-list{list-style:none;padding:8px 14px 12px;}
+.sub-list li{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px dashed #eee;}
+.sub-list li:last-child{border-bottom:none;}
+.sub-arrow{color:var(--orange);font-weight:700;flex-shrink:0;margin-top:1px;font-size:11px;}
+.sub-content{flex:1;}
+.sub-content a{color:var(--navy);text-decoration:none;font-size:12.5px;line-height:1.5;}
+.sub-content a:hover{color:var(--orange);text-decoration:underline;}
+.doc-tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:middle;font-weight:600;}
+.tag-gr{background:#dbeeff;color:var(--navy);border:1px solid #b3d4f0;}
+.tag-form{background:#dcfce7;color:#155e38;border:1px solid #86efac;}
+.tag-doc{background:#fef9c3;color:#713f12;border:1px solid #fde047;}
+.tag-guide{background:#f3e8ff;color:#6b21a8;border:1px solid #c084fc;}
+.tag-msme{background:#fff0f0;color:#9a1616;border:1px solid #fca5a5;}
+.src-badge{display:inline-block;background:var(--teal);color:#fff;font-size:9px;padding:1px 6px;border-radius:2px;margin-left:4px;vertical-align:middle;}
+
+/* detail box */
+.detail-box{margin:0 14px 10px;padding:10px 12px;background:#f8faff;border:1px solid #dce8f8;border-radius:var(--radius);font-size:12px;line-height:1.6;}
+.detail-box dl{display:grid;grid-template-columns:160px 1fr;gap:3px 10px;}
+.detail-box dt{color:var(--muted);font-weight:600;}
+.detail-box dd{color:var(--text);}
+
+/* legend */
+.legend{display:flex;gap:8px;flex-wrap:wrap;padding:8px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;font-size:11px;}
+.leg-item{display:flex;align-items:center;gap:5px;}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+/* sidebar */
+.sb-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow);}
+.sb-title{padding:7px 12px;font-size:12px;font-weight:700;color:#fff;}
+.sb-links{padding:6px 10px;}
+.sb-links a{display:block;padding:5px 2px;font-size:12px;color:var(--navy);text-decoration:none;border-bottom:1px dotted #e0e0e0;}
+.sb-links a:last-child{border-bottom:none;} .sb-links a:hover{color:var(--orange);}
+.sb-info{padding:8px 12px;font-size:11px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);}
+
+/* tab panels */
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+
+/* loading overlay */
+.loading-overlay{padding:40px;text-align:center;color:var(--muted);}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid #dde2e8;border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* footer */
+footer{text-align:center;padding:12px;font-size:11px;color:#999;border-top:1px solid var(--border);margin-top:10px;}
+
+/* highlight search */
+.hl{background:#fff176;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     CONFIGURATION — EDIT THESE 3 VALUES
+═══════════════════════════════════════ -->
+<script>
+// ┌─────────────────────────────────────────────────────────────┐
+// │  STEP 1: Replace with your Google Sheet ID                  │
+// │  (from URL: docs.google.com/spreadsheets/d/SHEET_ID/edit)   │
+// └─────────────────────────────────────────────────────────────┘
+const SHEET_ID = '1M9Eh9YabtN-ap7eSLOluyeiaEHY1k1Sh';
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │  STEP 2: Replace with actual GID of each sheet tab          │
+// │  (open each tab → URL ends with #gid=NUMBER)                │
+// └─────────────────────────────────────────────────────────────┘
+const GR_GID     = '352969796';      // GID of the 'GRs' tab
+const SCHEME_GID = '99945594';  // GID of the 'Schemes' tab
+</script>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">🏭</div>
+      <div class="logo-text">
+        <h1>Gujarat Industrial Policy 2020 — Live Navigator</h1>
+        <p>Data source: Google Sheets · Auto-updates when sheet is edited</p>
+      </div>
+    </div>
+    <div class="hlinks">
+      <a class="hlink" href="https://ic.gujarat.gov.in/industrial-policy2020.aspx" target="_blank">🏛 IC Portal</a>
+      <a class="hlink" href="https://msmec.gujarat.gov.in/posts?id=76" target="_blank">🏢 MSME Portal</a>
+      <a class="hlink" href="https://indextb.com" target="_blank">📚 iNDEXTb</a>
+      <a class="hlink" href="https://ic.gujarat.gov.in/documents/commondoc/2020/Industrial-Policy2020.pdf" target="_blank">📄 Full Policy PDF</a>
+    </div>
+  </div>
+  <div class="breadcrumb">
+    <a href="https://ic.gujarat.gov.in" target="_blank">🏠 Home</a> ›
+    <a href="https://ic.gujarat.gov.in/industrial-policy2020.aspx" target="_blank">Incentive Schemes</a> ›
+    <span>Industrial Policy 2020 — Live Scheme Navigator</span>
+  </div>
+</header>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-dot loading" id="sdot"></div>
+  <span class="status-text" id="stext">Loading data from Google Sheet…</span>
+  <span class="last-updated" id="lupd"></span>
+  <button class="refresh-btn" onclick="loadAll()">⟳ Refresh</button>
+</div>
+
+<!-- TABS -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('ic')">🏛 IC Portal View <span class="tab-badge" id="ic-count">—</span></button>
+  <button class="tab-btn" onclick="switchTab('msme')">🏢 MSME Portal View <span class="tab-badge" id="msme-count">—</span></button>
+  <button class="tab-btn" onclick="switchTab('combined')">🔗 Combined Tree <span class="tab-badge" id="comb-count">ALL</span></button>
+</nav>
+
+<!-- ═══ TAB 1 — IC PORTAL ═══ -->
+<div id="tab-ic" class="tab-panel active">
+<div class="page">
+  <div class="content">
+    <div class="controls">
+      <button class="ctrl-btn" onclick="toggleAll('ic-acc',true)">▼ Expand All</button>
+      <button class="ctrl-btn" onclick="toggleAll('ic-acc',false)">▲ Collapse All</button>
+      <input class="search-box" type="text" placeholder="🔍 Search schemes, GR numbers…" oninput="filterTab(this,'tab-ic')">
+      <button class="ctrl-btn orange" onclick="window.open('https://ic.gujarat.gov.in/industrial-policy2020.aspx','_blank')">Open Live Portal ↗</button>
+    </div>
+    <div class="section-label">📋 Government Resolution Index</div>
+    <div id="ic-gr-wrap"><div class="loading-overlay"><div class="spinner"></div><br>Loading…</div></div>
+    <div class="section-label">📂 Scheme Tabs</div>
+    <div id="ic-schemes"><div class="loading-overlay"><div class="spinner"></div><br>Loading…</div></div>
+  </div>
+  <div class="sidebar">
+    <div class="sb-box">
+      <div class="sb-title" style="background:var(--orange)">RELATED LINKS</div>
+      <div class="sb-links">
+        <a href="https://ic.gujarat.gov.in/industrial-policy2020.aspx" target="_blank">► Industrial Policy 2020</a>
+        <a href="https://ic.gujarat.gov.in/industrial-policy2015.aspx" target="_blank">► Industrial Policy 2015</a>
+        <a href="https://ic.gujarat.gov.in/aatmanirbhar-gujarat.aspx" target="_blank">► Aatmanirbhar Gujarat</a>
+        <a href="https://ic.gujarat.gov.in/gujarat-textile-policy-2024.aspx" target="_blank">► Gujarat Textile Policy 2024</a>
+      </div>
+    </div>
+    <div class="sb-box">
+      <div class="sb-title" style="background:var(--navy)">KEY DOCUMENTS</div>
+      <div class="sb-links">
+        <a href="https://ic.gujarat.gov.in/documents/commondoc/2020/Industrial-Policy2020.pdf" target="_blank">📄 Full Policy Document</a>
+        <a href="https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf" target="_blank">🗺 Taluka Zone Classification</a>
+        <a href="https://startup.gujarat.gov.in" target="_blank">🚀 Gujarat Startup Portal</a>
+        <a href="https://swc.gujarat.gov.in" target="_blank">🔗 Single Window Clearance</a>
+      </div>
+      <div class="sb-info">📞 079-23258381/86/87<br>✉ msmeinc@gujarat.gov.in</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TAB 2 — MSME PORTAL ═══ -->
+<div id="tab-msme" class="tab-panel">
+<div class="page">
+  <div class="content">
+    <div class="controls">
+      <button class="ctrl-btn" onclick="toggleAll('msme-acc',true)">▼ Expand All</button>
+      <button class="ctrl-btn" onclick="toggleAll('msme-acc',false)">▲ Collapse All</button>
+      <input class="search-box" type="text" placeholder="🔍 Search MSME schemes…" oninput="filterTab(this,'tab-msme')">
+      <button class="ctrl-btn orange" onclick="window.open('https://msmec.gujarat.gov.in/posts?id=76','_blank')">Open MSME Portal ↗</button>
+    </div>
+    <div class="section-label">🏢 Aatmanirbhar Gujarat 2022 — MSME Schemes</div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Aatmanirbhar 2022</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>SC/ST Special</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Merged with IC Portal</div>
+    </div>
+    <div id="msme-schemes"><div class="loading-overlay"><div class="spinner"></div><br>Loading…</div></div>
+  </div>
+  <div class="sidebar">
+    <div class="sb-box">
+      <div class="sb-title" style="background:var(--teal)">AATMANIRBHAR 2022</div>
+      <div class="sb-links">
+        <a href="https://msmec.gujarat.gov.in/posts?id=76" target="_blank">Aatmanirbhar Gujarat 2022</a>
+        <a href="https://msmec.gujarat.gov.in/industrialpolicy_twenty" target="_blank">Industrial Policy 2020</a>
+        <a href="https://msmec.gujarat.gov.in/incentivescheme" target="_blank">All Incentive Schemes</a>
+        <a href="https://msmec.gujarat.gov.in/policies" target="_blank">Policies</a>
+      </div>
+      <div class="sb-info"><strong>Scheme validity:</strong><br>05/10/2022 → 04/10/2027</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TAB 3 — COMBINED ═══ -->
+<div id="tab-combined" class="tab-panel">
+<div class="page">
+  <div class="content">
+    <div class="controls">
+      <button class="ctrl-btn" onclick="toggleAll('comb-acc',true)">▼ Expand All</button>
+      <button class="ctrl-btn" onclick="toggleAll('comb-acc',false)">▲ Collapse All</button>
+      <input class="search-box" type="text" placeholder="🔍 Search across all schemes…" oninput="filterTab(this,'tab-combined')">
+    </div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--orange)"></div>IC Portal only</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>MSME Portal only</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Merged (both portals)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>SC/ST Special</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--navy)"></div>GR Reference</div>
+    </div>
+    <div id="combined-schemes"><div class="loading-overlay"><div class="spinner"></div><br>Loading…</div></div>
+  </div>
+  <div class="sidebar">
+    <div class="sb-box">
+      <div class="sb-title" style="background:var(--purple)">COMBINED NAVIGATOR</div>
+      <div class="sb-links">
+        <a href="https://ic.gujarat.gov.in/industrial-policy2020.aspx" target="_blank">🏛 IC Gujarat Portal</a>
+        <a href="https://msmec.gujarat.gov.in/posts?id=76" target="_blank">🏢 MSME Aatmanirbhar 2022</a>
+        <a href="https://msmec.gujarat.gov.in/industrialpolicy_twenty" target="_blank">🏢 MSME IP 2020</a>
+        <a href="https://indextb.com" target="_blank">📚 iNDEXTb Docs</a>
+      </div>
+      <div class="sb-info">
+        <strong>Purple ⚡ MERGED</strong> = scheme appears on both portals<br><br>
+        Add new GRs or schemes in your Google Sheet → refresh to see updates instantly.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer>
+  Gujarat IP 2020 Live Navigator · Data: Google Sheets (ic.gujarat.gov.in + msmec.gujarat.gov.in) ·
+  Verify latest GRs from official portals before advising clients
+</footer>
+
+<!-- ════════════════════ LOGIC ════════════════════ -->
+<script>
+// ── helpers ──────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const csvUrl = gid =>
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
+
+function setStatus(state, msg) {
+  const dot  = $('sdot');
+  const text = $('stext');
+  dot.className = 'status-dot ' + state;
+  text.textContent = msg;
+  if (state === 'ok') {
+    $('lupd').textContent = 'Last refreshed: ' + new Date().toLocaleTimeString('en-IN');
+  }
+}
+
+// ── CSV parser ────────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split('\n');
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cols.push(cur.trim());
+    rows.push(cols);
+  }
+  return rows;
+}
+
+// ── tag helpers ───────────────────────────────────────────────────────────────
+function tagCls(tag) {
+  return ({gr:'tag-gr',form:'tag-form',doc:'tag-doc',guide:'tag-guide',msme:'tag-msme'})[tag] || 'tag-doc';
+}
+function colorCls(col) {
+  return ({teal:'teal',green:'green',purple:'purple',navy:'navy',orange:''})[col] || '';
+}
+
+// ── build GR table ────────────────────────────────────────────────────────────
+function buildGRTable(rows, containerId) {
+  const data = rows.slice(1).filter(r => r[0] && r[0] !== 'SR_NO');
+  const html = `<div class="gr-wrap"><table class="gr">
+    <thead><tr><th>Sr</th><th>Date</th><th>GR Number</th><th>Subject</th><th>Open</th></tr></thead>
+    <tbody>${data.map(r => `<tr>
+      <td class="td-sr">${r[0]}.</td>
+      <td class="td-dt">${r[1]||''}</td>
+      <td class="td-gr">${r[2]||''}</td>
+      <td class="td-sb">${r[3]||''}${r[5]==='NEW'?'<span class="new-badge">NEW</span>':''}</td>
+      <td class="td-pd"><a class="pdf-btn" href="${r[4]||'#'}" target="_blank" title="View/Download PDF">PDF</a></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+  $(containerId).innerHTML = html;
+}
+
+// ── build scheme accordions ───────────────────────────────────────────────────
+function buildSchemes(rows, containerId, filterTab, accCls) {
+  const data = rows.slice(1).filter(r => r[0] && r[0] !== 'ROW_TYPE');
+
+  // group rows into schemes with items
+  const groups = [];
+  let cur = null;
+  for (const r of data) {
+    const type = (r[0]||'').trim().toUpperCase();
+    const tab  = (r[1]||'').trim().toUpperCase();
+    if (type === 'SCHEME') {
+      if (filterTab && tab !== filterTab && tab !== 'BOTH') { cur = null; continue; }
+      cur = { tab, color:r[2]||'', title:r[3]||'', src:r[6]||'', detail:r[7]||'', items:[] };
+      groups.push(cur);
+    } else if (type === 'ITEM' && cur) {
+      cur.items.push({ text:r[3]||'', tag:(r[4]||'gr').toLowerCase(), url:r[5]||'#', src:r[6]||'' });
+    }
+  }
+
+  if (!groups.length) {
+    $(containerId).innerHTML = '<div class="loading-overlay">No schemes found for this tab.</div>';
+    return groups.length;
+  }
+
+  const isMerged = g => g.tab === 'BOTH' || g.color === 'purple';
+
+  const html = groups.map((g,i) => {
+    // detail box
+    let detHtml = '';
+    if (g.detail) {
+      const pairs = g.detail.split('|').map(p => p.trim()).filter(Boolean);
+      if (pairs.length) {
+        detHtml = `<div class="detail-box"><dl>${pairs.map(p => {
+          const [k,...v] = p.split(':');
+          return `<dt>${k.trim()}</dt><dd>${v.join(':').trim()}</dd>`;
+        }).join('')}</dl></div>`;
+      }
+    }
+    // items
+    const itemsHtml = `<ul class="sub-list">${g.items.map(it =>
+      `<li><span class="sub-arrow">❯</span><div class="sub-content">
+        <a href="${it.url}" target="_blank">${it.text}</a>
+        <span class="doc-tag ${tagCls(it.tag)}">${it.tag.toUpperCase()}</span>
+        ${it.src ? `<span class="src-badge">${it.src}</span>` : ''}
+      </div></li>`
+    ).join('')}</ul>`;
+
+    return `<div class="acc-item ${accCls}">
+      <div class="acc-head ${colorCls(g.color)}" onclick="toggle(this)">
+        <span class="acc-icon">❯</span>
+        <span class="acc-title">${g.title}${isMerged(g)?'<span class="merged-badge">MERGED ⚡</span>':''}</span>
+        ${g.src ? `<span class="acc-src">${g.src}</span>` : ''}
+      </div>
+      <div class="acc-body">
+        ${detHtml}${itemsHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  $(containerId).innerHTML = html;
+  return groups.length;
+}
+
+// ── main load ─────────────────────────────────────────────────────────────────
+async function loadAll() {
+  setStatus('loading', 'Fetching data from Google Sheet…');
+
+  if (SHEET_ID === 'YOUR_SHEET_ID_HERE') {
+    setStatus('err', '⚠  Setup required: replace 1M9Eh9YabtN-ap7eSLOluyeiaEHY1k1Sh in the HTML file with your Google Sheet ID');
+    ['ic-gr-wrap','ic-schemes','msme-schemes','combined-schemes'].forEach(id => {
+      $(id).innerHTML = `<div class="loading-overlay" style="color:#c0390b;">
+        <strong>Setup required</strong><br><br>
+        Open this HTML file in Notepad and replace:<br>
+        <code>1M9Eh9YabtN-ap7eSLOluyeiaEHY1k1Sh</code> → your Google Sheet ID<br>
+        <code>352969796</code> → GID of the GRs tab<br>
+        <code>99945594</code> → GID of the Schemes tab<br><br>
+        See the INSTRUCTIONS sheet in the Excel template for details.
+      </div>`;
+    });
+    return;
+  }
+
+  try {
+    const [grRes, scRes] = await Promise.all([
+      fetch(csvUrl(GR_GID)),
+      fetch(csvUrl(SCHEME_GID))
+    ]);
+
+    if (!grRes.ok || !scRes.ok) throw new Error('Fetch failed');
+
+    const [grText, scText] = await Promise.all([grRes.text(), scRes.text()]);
+    const grRows = parseCSV(grText);
+    const scRows = parseCSV(scText);
+
+    // GR table — used on IC and Combined tabs
+    const grHtml = buildGRTableHTML(grRows);
+    $('ic-gr-wrap').innerHTML = grHtml;
+
+    // IC schemes
+    const icCnt = buildSchemes(scRows, 'ic-schemes', 'IC', 'ic-acc');
+    $('ic-count').textContent = icCnt;
+
+    // MSME schemes
+    const msmeCnt = buildSchemes(scRows, 'msme-schemes', 'MSME', 'msme-acc');
+    $('msme-count').textContent = msmeCnt;
+
+    // Combined — GR + all
+    $('combined-schemes').innerHTML =
+      `<div class="section-label">📋 Government Resolution Index — All GRs</div>
+       <div class="acc-item comb-acc">
+         <div class="acc-head navy" onclick="toggle(this)">
+           <span class="acc-icon open">❯</span>
+           <span class="acc-title">GOVERNMENT RESOLUTION INDEX</span>
+           <span class="acc-src">Both Portals</span>
+         </div>
+         <div class="acc-body open">${grHtml}</div>
+       </div>
+       <div class="section-label">📂 All Schemes (IC + MSME Merged)</div>`;
+
+    buildSchemes(scRows, 'combined-schemes', null, 'comb-acc');
+    // append to existing content
+    const combEl = $('combined-schemes');
+    const allCnt = scRows.slice(1).filter(r=>r[0]==='SCHEME').length;
+    $('comb-count').textContent = allCnt + ' schemes';
+
+    setStatus('ok', `✅  Loaded ${grRows.length - 1} GRs · ${allCnt} schemes from Google Sheet`);
+
+  } catch(e) {
+    setStatus('err', '❌  Could not load Sheet. Check SHEET_ID / GIDs, or ensure Sheet is published to web.');
+    console.error(e);
+  }
+}
+
+function buildGRTableHTML(rows) {
+  const data = rows.slice(1).filter(r => r[0] && r[0] !== 'SR_NO');
+  return `<div class="gr-wrap"><table class="gr">
+    <thead><tr><th>Sr</th><th>Date</th><th>GR Number</th><th>Subject</th><th>Open</th></tr></thead>
+    <tbody>${data.map(r => `<tr>
+      <td class="td-sr">${r[0]}.</td>
+      <td class="td-dt">${r[1]||''}</td>
+      <td class="td-gr">${r[2]||''}</td>
+      <td class="td-sb">${r[3]||''}${r[5]==='NEW'?'<span class="new-badge">NEW</span>':''}</td>
+      <td class="td-pd"><a class="pdf-btn" href="${r[4]||'#'}" target="_blank" title="View/Download PDF">PDF</a></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── UI controls ───────────────────────────────────────────────────────────────
+function toggle(head) {
+  const body = head.nextElementSibling;
+  const icon = head.querySelector('.acc-icon');
+  const open = body.classList.toggle('open');
+  icon.classList.toggle('open', open);
+}
+
+function toggleAll(cls, open) {
+  document.querySelectorAll('.' + cls).forEach(item => {
+    const body = item.querySelector('.acc-body');
+    const icon = item.querySelector('.acc-icon');
+    if (body) body.classList.toggle('open', open);
+    if (icon) icon.classList.toggle('open', open);
+  });
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  $('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes(`'${name}'`)) b.classList.add('active');
+  });
+}
+
+function filterTab(input, panelId) {
+  const q = input.value.toLowerCase().trim();
+  document.querySelectorAll(`#${panelId} .acc-item`).forEach(item => {
+    item.style.display = (!q || item.textContent.toLowerCase().includes(q)) ? '' : 'none';
+  });
+}
+
+// ── init ──────────────────────────────────────────────────────────────────────
+loadAll();
+
+// Auto-refresh every 5 minutes
+setInterval(loadAll, 5 * 60 * 1000);
+</script>
+</body>
+</html>
