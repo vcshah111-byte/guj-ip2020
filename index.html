@@ -329,114 +329,215 @@ const SCHEME_GID = '99945594';  // GID of the 'Schemes' tab
 
 <!-- ════════════════════ LOGIC ════════════════════ -->
 <script>
+// ── EMBEDDED DATA — edit these arrays when new GRs/schemes are added ────────
+// To update: edit on GitHub directly (index.html → pencil icon → edit → commit)
+
+const GR_DATA = [
+  {sr:1,  date:"05/10/2022", grno:"MIS-102022-1271(1)-I(ch)", subj:"Aatmanirbhar Gujarat Scheme for assistance to MSMEs", badge:"NEW", url:"https://ic.gujarat.gov.in/documents/commondoc/2022/Aatmanirbhar-MSME.pdf"},
+  {sr:2,  date:"05/10/2022", grno:"MIS-102022-1271(2)-I",     subj:"Aatmanirbhar Gujarat Scheme for assistance to Large Industries and Thrust Sector", badge:"NEW", url:"https://ic.gujarat.gov.in/documents/commondoc/2022/Aatmanirbhar-LargeIndustry.pdf"},
+  {sr:3,  date:"05/10/2022", grno:"MIS-102022-1271(3)-I",     subj:"Aatmanirbhar Gujarat Scheme for assistance to Mega Industries", badge:"NEW", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:4,  date:"01/09/2020", grno:"GID-102020-326811-G",      subj:"Assistance for Environment Protection Measures", badge:"NEW", url:"https://startup.gujarat.gov.in/files/2020/11/67fa51ad-d410-49be-8ff3-f93adc784118_13-GR_02092020.pdf"},
+  {sr:5,  date:"01/09/2020", grno:"GID-102020-327060-G",      subj:"Assistance for Research & Development Activities", badge:"NEW", url:"https://indextb.com/files/2020/10/3fdd6d44-97e1-4c18-bf0c-6b99ea34897a_3-GR_02092020.pdf"},
+  {sr:6,  date:"01/09/2020", grno:"GID-102020-326568-G",      subj:"Assistance to Logistic Park", badge:"NEW", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:7,  date:"01/09/2020", grno:"GID-102020-326163-G",      subj:"Assistance for Industrial Infrastructure", badge:"NEW", url:"https://cdn.vibrantgujarat.com/event/document/1698658953357-Assitance-for-Industrial-Infrastructure.pdf"},
+  {sr:8,  date:"01/09/2020", grno:"GID-102020-326498-G",      subj:"Financial Assistance to Industrial Parks", badge:"NEW", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:9,  date:"01/09/2020", grno:"GID-102020-326192-G",      subj:"Assistance for Common Environment Infrastructure", badge:"NEW", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:10, date:"01/09/2020", grno:"MIS-102020-327041-I",      subj:"Assistance for Start-up / Innovation", badge:"NEW", url:"https://indextb.com/files/2020/10/3fdd6d44-97e1-4c18-bf0c-6b99ea34897a_3-GR_02092020.pdf"},
+  {sr:11, date:"01/09/2020", grno:"MIS-102020-327034-I",      subj:"Capital Subsidy to Large Industries and Thrust Sectors", badge:"NEW", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:12, date:"01/09/2020", grno:"MIS-102020-326514-I",      subj:"Enhancement of Technical Compliance and Manpower", badge:"NEW", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:13, date:"01/09/2020", grno:"SB-102020-326356-CH",      subj:"Assistance to GIDC for Multi Storied Sheds for MSEs", badge:"", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:14, date:"01/09/2020", grno:"SB-102020-326376-CH",      subj:"Dr. Babasaheb Ambedkar Udyog Uday Yojana for SC and ST Entrepreneurs", badge:"", url:"https://indextb.com/files/2020/10/b0e2ed2a-18ff-4a0f-a132-407b89ef271f_2-GR_02092020.pdf"},
+  {sr:15, date:"01/09/2020", grno:"SB-102020-326376-CH",      subj:"Assistance to Micro, Small and Medium Enterprises (MSMEs)", badge:"", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:16, date:"01/09/2020", grno:"SB-102020-326320-CH",      subj:"Advance to MSMEs", badge:"", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:17, date:"01/09/2020", grno:"SB-102020-326340-CH",      subj:"Market Development Assistance to MSMEs", badge:"", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:18, date:"01/09/2020", grno:"SB-102020-326321-CH",      subj:"Assistance to MSEs for Sheds developed by Private Developers", badge:"", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+  {sr:19, date:"02/11/2020", grno:"MIS-102020-347965-I",      subj:"Gujarat IP 2020 — Classification of talukas for Incentive schemes", badge:"", url:"https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf"},
+  {sr:20, date:"30/07/2021", grno:"GID-102020-650-L",         subj:"Gujarat Integrated Logistics and Logistic Park Policy 2022", badge:"", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+];
+
+const SCHEME_DATA = [
+  // ── IC PORTAL SCHEMES ──────────────────────────────────────────────────────
+  {type:"SCHEME", tab:"IC", color:"orange", title:"CAPITAL SUBSIDY TO LARGE INDUSTRIES AND THRUST SECTOR", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2022–2027 (Aatmanirbhar) | Eligible: Large Industries FCI >₹50 Cr | Max subsidy: 20% of FCI (Zone D) | GR: MIS-102022-1271(2)-I",
+   items:[
+    {text:"Capital Subsidy GR — Aatmanirbhar Gujarat for Large Industries (MIS-102022-1271(2)-I)", tag:"gr", url:"https://ic.gujarat.gov.in/documents/commondoc/2022/Aatmanirbhar-LargeIndustry.pdf"},
+    {text:"Classification of talukas GR (MIS-102020-347965-I · 02/11/2020)", tag:"gr", url:"https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf"},
+    {text:"Reconstitution of Sanctioning Authorities GR (07-03-2024)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Checklists", tag:"doc", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"SCHEME FOR ASSISTANCE FOR STARTUPS / INNOVATION", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2020–2025 | Eligible: DPIIT-recognized startups | Seed capital: Up to ₹30 lakh (50%) | GR: MIS-102020-327041-I",
+   items:[
+    {text:"Startups/Innovation GR (MIS-102020-327041-I · 01/09/2020)", tag:"gr", url:"https://indextb.com/files/2020/10/3fdd6d44-97e1-4c18-bf0c-6b99ea34897a_3-GR_02092020.pdf"},
+    {text:"Classification of talukas GR (MIS-102020-347965-I)", tag:"gr", url:"https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"ASSISTANCE FOR INDUSTRIAL INFRASTRUCTURE", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2020–2025 | Eligible: Associations / GIDC / SPVs | Max grant: 75% cost (max ₹20 Cr) Zone D | GR: GID-102020-326163-G",
+   items:[
+    {text:"Industrial Infrastructure GR (GID-102020-326163-G · 01/09/2020)", tag:"gr", url:"https://cdn.vibrantgujarat.com/event/document/1698658953357-Assitance-for-Industrial-Infrastructure.pdf"},
+    {text:"Classification of talukas GR (MIS-102020-347965-I)", tag:"gr", url:"https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"SCHEME FOR INDUSTRIAL PARK", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2020–2025 | Eligible: Private developers min 50 acres | Max grant: 25% cost (max ₹25 Cr) | GR: GID-102020-326498-G",
+   items:[
+    {text:"Industrial Parks GR (GID-102020-326498-G · 01/09/2020)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"SCHEME FOR LOGISTIC PARK", src:"ic.gujarat.gov.in",
+   detail:"Validity: Gujarat Logistics Policy 2022 | Max grant: 25% cost (max ₹25 Cr) | GR: GID-102020-326568-G | GID-102020-650-L",
+   items:[
+    {text:"Logistic Park GR (GID-102020-326568-G · 01/09/2020)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Gujarat Integrated Logistics Policy 2022 GR (GID-102020-650-L)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"SCHEME FOR FINANCIAL ASSISTANCE TO INTEGRATED LOGISTICS FACILITIES", src:"ic.gujarat.gov.in",
+   detail:"Validity: Gujarat Logistics Policy 2022 | Min investment: ₹50 Cr | Subsidy: 15–25% capex + Interest 7 yrs | GR: GID-102020-650-L",
+   items:[
+    {text:"Gujarat Integrated Logistics & Logistic Park Policy 2022 (GID-102020-650-L)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"ASSISTANCE FOR ENVIRONMENT PROTECTION MEASURES", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2020–2025 | Eligible: Individual units MSME & Large | Max grant: 30% cost (max ₹50 lakh) Zone D | GR: GID-102020-326811-G",
+   items:[
+    {text:"Environment Protection GR (GID-102020-326811-G · 01/09/2020)", tag:"gr", url:"https://startup.gujarat.gov.in/files/2020/11/67fa51ad-d410-49be-8ff3-f93adc784118_13-GR_02092020.pdf"},
+    {text:"Common Environment Infrastructure GR (GID-102020-326192-G)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Classification of talukas GR (MIS-102020-347965-I)", tag:"gr", url:"https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"ASSISTANCE FOR RESEARCH & DEVELOPMENT ACTIVITIES", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2020–2025 | Max grant: 50% R&D cost (max ₹25 lakh/yr) | Patent India: max ₹2L | International: max ₹10L | GR: GID-102020-327060-G",
+   items:[
+    {text:"R&D Assistance GR (GID-102020-327060-G · 01/09/2020)", tag:"gr", url:"https://indextb.com/files/2020/10/3fdd6d44-97e1-4c18-bf0c-6b99ea34897a_3-GR_02092020.pdf"},
+    {text:"Classification of talukas GR (MIS-102020-347965-I)", tag:"gr", url:"https://indextb.com/files/2020/11/a34fc914-6cdd-4fd6-8773-502017da4334_taluka%20category.pdf"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  {type:"SCHEME", tab:"IC", color:"orange", title:"FINANCIAL ASSISTANCE TO COMMON ENVIRONMENTAL INFRASTRUCTURE FACILITIES", src:"ic.gujarat.gov.in",
+   detail:"Validity: 2020–2025 | Eligible: Clusters / Associations / GIDC | Max grant: 80% CETP/ZLD cost (max ₹40 Cr) Zone D | GR: GID-102020-326192-G",
+   items:[
+    {text:"Common Environment Infrastructure GR (GID-102020-326192-G · 01/09/2020)", tag:"gr", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Application Form", tag:"form", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"},
+    {text:"Guideline", tag:"guide", url:"https://ic.gujarat.gov.in/industrial-policy2020.aspx"}
+  ]},
+  // ── MSME PORTAL SCHEMES ────────────────────────────────────────────────────
+  {type:"SCHEME", tab:"MSME", color:"teal", title:"MSME — Capital Subsidy + Interest Subsidy + CGTMSE Fees", src:"msmec.gujarat.gov.in",
+   detail:"Validity: 05/10/2022–04/10/2027 | Capital subsidy Micro Cat1: 35% Cat2: 25% Cat3: 15% | Interest Cat1: 7%/7yrs Cat2: 6%/6yrs Cat3: 5%/5yrs | GR: MIS-102022-1271(1)-I(ch)",
+   items:[
+    {text:"Aatmanirbhar Gujarat MSME GR (MIS-102022-1271(1)-I(ch) · 05/10/2022)", tag:"gr", url:"https://ic.gujarat.gov.in/documents/commondoc/2022/Aatmanirbhar-MSME.pdf"},
+    {text:"IP 2020 base GR — MSME Scheme (SSI/102020/332278/Ch · 01/09/2020)", tag:"gr", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Amendment in Guideline", tag:"guide", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"teal", title:"MSME — Net SGST Reimbursement", src:"msmec.gujarat.gov.in",
+   detail:"Validity: 05/10/2022–04/10/2027 | Cat1: 100%/10yrs max 7.5%eFCI/yr | Cat2: 75% | Cat3: 50% | Note: Delinked from production",
+   items:[
+    {text:"Aatmanirbhar Gujarat MSME GR — SGST component (MIS-102022-1271(1)-I(ch))", tag:"gr", url:"https://ic.gujarat.gov.in/documents/commondoc/2022/Aatmanirbhar-MSME.pdf"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"teal", title:"MSME — Interest Subsidy to Service Sector", src:"msmec.gujarat.gov.in",
+   detail:"Validity: 05/10/2022–04/10/2027 | Eligible: 22 service categories + champion services | Interest: Cat1: 7% Cat2: 6% Cat3: 5%",
+   items:[
+    {text:"Aatmanirbhar Gujarat MSME GR — Service Sector component", tag:"gr", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"teal", title:"MSME — Quality Certification / ZED / ICT / ERP", src:"msmec.gujarat.gov.in",
+   detail:"Quality cert: 50% max ₹10L | ZED: 50% | ICT/ERP: 65% max ₹5L | ERP: 65% max ₹1L",
+   items:[
+    {text:"Quality / ZED / ICT component GR (MIS-102022-1271(1)-I(ch))", tag:"gr", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"teal", title:"MSME — Technology Acquisition / Patent Registration", src:"msmec.gujarat.gov.in",
+   detail:"Tech acquisition (foreign): 65% max ₹50L | Patent India: max ₹2L | Patent International: max ₹10L",
+   items:[
+    {text:"Technology / Patent component GR (MIS-102022-1271(1)-I(ch))", tag:"gr", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"teal", title:"MSME — Market Development Assistance (Trade Fairs)", src:"msmec.gujarat.gov.in",
+   detail:"National exhibitions: 75% stall rent max ₹2L | International: 60% max ₹5L | Max 2 events/yr | GR: SSI-102020-332321-Ch",
+   items:[
+    {text:"Market Development GR (SSI-102020-332321-Ch · 01/09/2020)", tag:"gr", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"green", title:"Dr. Babasaheb Ambedkar Udyog Uday Yojana (SC/ST Entrepreneurs)", src:"IC + MSME Portals",
+   detail:"Eligible: SC/ST entrepreneurs — MSE units only | Extra capital subsidy: 5–10% over normal | Extra interest: 1% additional | GR: SB-102020-326376-CH",
+   items:[
+    {text:"Dr. Ambedkar Yojana GR (SB-102020-326376-CH · 01/09/2020)", tag:"gr", url:"https://indextb.com/files/2020/10/b0e2ed2a-18ff-4a0f-a132-407b89ef271f_2-GR_02092020.pdf"},
+    {text:"IP 2020 GR — SC/ST Scheme (SSI/102020/332276/Ch · 01/09/2020)", tag:"gr", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"},
+    {text:"Application Form", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"purple", title:"ASSISTANCE FOR ENVIRONMENT PROTECTION (MSME Portal)", src:"IC + MSME Portals",
+   detail:"Eligible: MSME units individual | Max grant: 30% cost (max ₹50 lakh) Zone D | GR: GID-102020-326811-G",
+   items:[
+    {text:"Environment Protection GR (GID-102020-326811-G · 01/09/2020)", tag:"gr", url:"https://startup.gujarat.gov.in/files/2020/11/67fa51ad-d410-49be-8ff3-f93adc784118_13-GR_02092020.pdf"},
+    {text:"Application Form (MSME Portal)", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]},
+  {type:"SCHEME", tab:"MSME", color:"purple", title:"ASSISTANCE FOR R&D ACTIVITIES (MSME Portal)", src:"IC + MSME Portals",
+   detail:"Max grant: 50% R&D cost (max ₹25 lakh/yr) | Patent India: max ₹2L | International: max ₹10L | GR: GID-102020-327060-G",
+   items:[
+    {text:"R&D Assistance GR (GID-102020-327060-G · 01/09/2020)", tag:"gr", url:"https://indextb.com/files/2020/10/3fdd6d44-97e1-4c18-bf0c-6b99ea34897a_3-GR_02092020.pdf"},
+    {text:"Application Form (MSME Portal)", tag:"form", url:"https://msmec.gujarat.gov.in/industrialpolicy_twenty"}
+  ]}
+];
+
 // ── helpers ──────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
-// Uses Google Visualization API — works cross-origin without CORS issues
-const csvUrl = gid =>
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}&tq=select+*`;
-
-// Fetch via no-cors workaround using allorigins proxy
-const proxyUrl = url =>
-  `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
 function setStatus(state, msg) {
-  const dot  = $('sdot');
-  const text = $('stext');
+  const dot = $('sdot'), text = $('stext');
   dot.className = 'status-dot ' + state;
   text.textContent = msg;
-  if (state === 'ok') {
-    $('lupd').textContent = 'Last refreshed: ' + new Date().toLocaleTimeString('en-IN');
-  }
+  if (state === 'ok') $('lupd').textContent = 'Loaded: ' + new Date().toLocaleTimeString('en-IN');
 }
 
-// ── CSV parser ────────────────────────────────────────────────────────────────
-function parseCSV(text) {
-  const rows = [];
-  const lines = text.split('\n');
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    const cols = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQ = !inQ; }
-      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-      else cur += ch;
-    }
-    cols.push(cur.trim());
-    rows.push(cols);
-  }
-  return rows;
-}
-
-// ── tag helpers ───────────────────────────────────────────────────────────────
 function tagCls(tag) {
-  return ({gr:'tag-gr',form:'tag-form',doc:'tag-doc',guide:'tag-guide',msme:'tag-msme'})[tag] || 'tag-doc';
+  return ({gr:'tag-gr',form:'tag-form',doc:'tag-doc',guide:'tag-guide',msme:'tag-msme'})[tag]||'tag-doc';
 }
 function colorCls(col) {
-  return ({teal:'teal',green:'green',purple:'purple',navy:'navy',orange:''})[col] || '';
+  return ({teal:'teal',green:'green',purple:'purple',navy:'navy'})[col]||'';
 }
 
 // ── build GR table ────────────────────────────────────────────────────────────
-function buildGRTable(rows, containerId) {
-  const data = rows.slice(1).filter(r => r[0] && r[0] !== 'SR_NO');
-  const html = `<div class="gr-wrap"><table class="gr">
+function buildGRTableHTML() {
+  return `<div class="gr-wrap"><table class="gr">
     <thead><tr><th>Sr</th><th>Date</th><th>GR Number</th><th>Subject</th><th>Open</th></tr></thead>
-    <tbody>${data.map(r => `<tr>
-      <td class="td-sr">${r[0]}.</td>
-      <td class="td-dt">${r[1]||''}</td>
-      <td class="td-gr">${r[2]||''}</td>
-      <td class="td-sb">${r[3]||''}${r[5]==='NEW'?'<span class="new-badge">NEW</span>':''}</td>
-      <td class="td-pd"><a class="pdf-btn" href="${r[4]||'#'}" target="_blank" title="View/Download PDF">PDF</a></td>
+    <tbody>${GR_DATA.map(g=>`<tr>
+      <td class="td-sr">${g.sr}.</td>
+      <td class="td-dt">${g.date}</td>
+      <td class="td-gr">${g.grno}</td>
+      <td class="td-sb">${g.subj}${g.badge?'<span class="new-badge">'+g.badge+'</span>':''}</td>
+      <td class="td-pd"><a class="pdf-btn" href="${g.url}" target="_blank">PDF</a></td>
     </tr>`).join('')}</tbody>
   </table></div>`;
-  $(containerId).innerHTML = html;
 }
 
-// ── build scheme accordions ───────────────────────────────────────────────────
-function buildSchemes(rows, containerId, filterTab, accCls) {
-  const data = rows.slice(1).filter(r => r[0] && r[0] !== 'ROW_TYPE');
+// ── build schemes ─────────────────────────────────────────────────────────────
+function buildSchemes(containerId, filterTab, accCls) {
+  const groups = filterTab
+    ? SCHEME_DATA.filter(s => s.type==='SCHEME' && (s.tab===filterTab || s.tab==='BOTH'))
+    : SCHEME_DATA.filter(s => s.type==='SCHEME');
 
-  // group rows into schemes with items
-  const groups = [];
-  let cur = null;
-  for (const r of data) {
-    const type = (r[0]||'').trim().toUpperCase();
-    const tab  = (r[1]||'').trim().toUpperCase();
-    if (type === 'SCHEME') {
-      if (filterTab && tab !== filterTab && tab !== 'BOTH') { cur = null; continue; }
-      cur = { tab, color:r[2]||'', title:r[3]||'', src:r[6]||'', detail:r[7]||'', items:[] };
-      groups.push(cur);
-    } else if (type === 'ITEM' && cur) {
-      cur.items.push({ text:r[3]||'', tag:(r[4]||'gr').toLowerCase(), url:r[5]||'#', src:r[6]||'' });
-    }
-  }
+  const isMerged = g => g.tab==='BOTH' || g.color==='purple';
 
-  if (!groups.length) {
-    $(containerId).innerHTML = '<div class="loading-overlay">No schemes found for this tab.</div>';
-    return groups.length;
-  }
+  const html = groups.map(g => {
+    const detHtml = g.detail ? `<div class="detail-box"><dl>${
+      g.detail.split('|').map(p=>{const[k,...v]=p.trim().split(':');return`<dt>${k.trim()}</dt><dd>${v.join(':').trim()}</dd>`}).join('')
+    }</dl></div>` : '';
 
-  const isMerged = g => g.tab === 'BOTH' || g.color === 'purple';
-
-  const html = groups.map((g,i) => {
-    // detail box
-    let detHtml = '';
-    if (g.detail) {
-      const pairs = g.detail.split('|').map(p => p.trim()).filter(Boolean);
-      if (pairs.length) {
-        detHtml = `<div class="detail-box"><dl>${pairs.map(p => {
-          const [k,...v] = p.split(':');
-          return `<dt>${k.trim()}</dt><dd>${v.join(':').trim()}</dd>`;
-        }).join('')}</dl></div>`;
-      }
-    }
-    // items
-    const itemsHtml = `<ul class="sub-list">${g.items.map(it =>
+    const itemsHtml = `<ul class="sub-list">${(g.items||[]).map(it=>
       `<li><span class="sub-arrow">❯</span><div class="sub-content">
         <a href="${it.url}" target="_blank">${it.text}</a>
         <span class="doc-tag ${tagCls(it.tag)}">${it.tag.toUpperCase()}</span>
-        ${it.src ? `<span class="src-badge">${it.src}</span>` : ''}
+        ${it.src?`<span class="src-badge">${it.src}</span>`:''}
       </div></li>`
     ).join('')}</ul>`;
 
@@ -444,102 +545,47 @@ function buildSchemes(rows, containerId, filterTab, accCls) {
       <div class="acc-head ${colorCls(g.color)}" onclick="toggle(this)">
         <span class="acc-icon">❯</span>
         <span class="acc-title">${g.title}${isMerged(g)?'<span class="merged-badge">MERGED ⚡</span>':''}</span>
-        ${g.src ? `<span class="acc-src">${g.src}</span>` : ''}
+        ${g.src?`<span class="acc-src">${g.src}</span>`:''}
       </div>
-      <div class="acc-body">
-        ${detHtml}${itemsHtml}
-      </div>
+      <div class="acc-body">${detHtml}${itemsHtml}</div>
     </div>`;
   }).join('');
 
-  $(containerId).innerHTML = html;
+  $(containerId).innerHTML = html || '<div class="loading-overlay">No schemes found.</div>';
   return groups.length;
 }
 
-// ── main load ─────────────────────────────────────────────────────────────────
-async function loadAll() {
-  setStatus('loading', 'Fetching data from Google Sheet…');
+// ── main init ─────────────────────────────────────────────────────────────────
+function loadAll() {
+  // GR tables
+  const grHtml = buildGRTableHTML();
+  $('ic-gr-wrap').innerHTML = grHtml;
 
-  if (SHEET_ID === 'YOUR_SHEET_ID_HERE') {
-    setStatus('err', '⚠  Setup required: replace 1M9Eh9YabtN-ap7eSLOluyeiaEHY1k1Sh in the HTML file with your Google Sheet ID');
-    ['ic-gr-wrap','ic-schemes','msme-schemes','combined-schemes'].forEach(id => {
-      $(id).innerHTML = `<div class="loading-overlay" style="color:#c0390b;">
-        <strong>Setup required</strong><br><br>
-        Open this HTML file in Notepad and replace:<br>
-        <code>1M9Eh9YabtN-ap7eSLOluyeiaEHY1k1Sh</code> → your Google Sheet ID<br>
-        <code>352969796</code> → GID of the GRs tab<br>
-        <code>99945594</code> → GID of the Schemes tab<br><br>
-        See the INSTRUCTIONS sheet in the Excel template for details.
-      </div>`;
-    });
-    return;
-  }
+  // IC schemes
+  const icCnt = buildSchemes('ic-schemes', 'IC', 'ic-acc');
+  $('ic-count').textContent = icCnt;
 
-  try {
-    const [grRes, scRes] = await Promise.all([
-      fetch(proxyUrl(csvUrl(GR_GID))),
-      fetch(proxyUrl(csvUrl(SCHEME_GID)))
-    ]);
+  // MSME schemes
+  const msmeCnt = buildSchemes('msme-schemes', 'MSME', 'msme-acc');
+  $('msme-count').textContent = msmeCnt;
 
-    if (!grRes.ok || !scRes.ok) throw new Error('Fetch failed');
-
-    const grJson = await grRes.json();
-    const scJson = await scRes.json();
-    const [grText, scText] = [grJson.contents, scJson.contents];
-    const grRows = parseCSV(grText);
-    const scRows = parseCSV(scText);
-
-    // GR table — used on IC and Combined tabs
-    const grHtml = buildGRTableHTML(grRows);
-    $('ic-gr-wrap').innerHTML = grHtml;
-
-    // IC schemes
-    const icCnt = buildSchemes(scRows, 'ic-schemes', 'IC', 'ic-acc');
-    $('ic-count').textContent = icCnt;
-
-    // MSME schemes
-    const msmeCnt = buildSchemes(scRows, 'msme-schemes', 'MSME', 'msme-acc');
-    $('msme-count').textContent = msmeCnt;
-
-    // Combined — GR + all
-    $('combined-schemes').innerHTML =
-      `<div class="section-label">📋 Government Resolution Index — All GRs</div>
-       <div class="acc-item comb-acc">
-         <div class="acc-head navy" onclick="toggle(this)">
-           <span class="acc-icon open">❯</span>
-           <span class="acc-title">GOVERNMENT RESOLUTION INDEX</span>
-           <span class="acc-src">Both Portals</span>
-         </div>
-         <div class="acc-body open">${grHtml}</div>
+  // Combined — GR accordion + all schemes
+  $('combined-schemes').innerHTML =
+    `<div class="section-label">📋 Government Resolution Index — All ${GR_DATA.length} GRs</div>
+     <div class="acc-item comb-acc">
+       <div class="acc-head navy" onclick="toggle(this)">
+         <span class="acc-icon open">❯</span>
+         <span class="acc-title">GOVERNMENT RESOLUTION INDEX</span>
+         <span class="acc-src">Both Portals</span>
        </div>
-       <div class="section-label">📂 All Schemes (IC + MSME Merged)</div>`;
+       <div class="acc-body open">${grHtml}</div>
+     </div>
+     <div class="section-label">📂 All Schemes (IC + MSME)</div>`;
 
-    buildSchemes(scRows, 'combined-schemes', null, 'comb-acc');
-    // append to existing content
-    const combEl = $('combined-schemes');
-    const allCnt = scRows.slice(1).filter(r=>r[0]==='SCHEME').length;
-    $('comb-count').textContent = allCnt + ' schemes';
+  buildSchemes('combined-schemes', null, 'comb-acc');
+  $('comb-count').textContent = SCHEME_DATA.filter(s=>s.type==='SCHEME').length + ' schemes';
 
-    setStatus('ok', `✅  Loaded ${grRows.length - 1} GRs · ${allCnt} schemes from Google Sheet`);
-
-  } catch(e) {
-    setStatus('err', '❌  Could not load Sheet. Check SHEET_ID / GIDs, or ensure Sheet is published to web.');
-    console.error(e);
-  }
-}
-
-function buildGRTableHTML(rows) {
-  const data = rows.slice(1).filter(r => r[0] && r[0] !== 'SR_NO');
-  return `<div class="gr-wrap"><table class="gr">
-    <thead><tr><th>Sr</th><th>Date</th><th>GR Number</th><th>Subject</th><th>Open</th></tr></thead>
-    <tbody>${data.map(r => `<tr>
-      <td class="td-sr">${r[0]}.</td>
-      <td class="td-dt">${r[1]||''}</td>
-      <td class="td-gr">${r[2]||''}</td>
-      <td class="td-sb">${r[3]||''}${r[5]==='NEW'?'<span class="new-badge">NEW</span>':''}</td>
-      <td class="td-pd"><a class="pdf-btn" href="${r[4]||'#'}" target="_blank" title="View/Download PDF">PDF</a></td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  setStatus('ok', `✅  ${GR_DATA.length} GRs · ${SCHEME_DATA.filter(s=>s.type==='SCHEME').length} schemes loaded`);
 }
 
 // ── UI controls ───────────────────────────────────────────────────────────────
@@ -549,7 +595,6 @@ function toggle(head) {
   const open = body.classList.toggle('open');
   icon.classList.toggle('open', open);
 }
-
 function toggleAll(cls, open) {
   document.querySelectorAll('.' + cls).forEach(item => {
     const body = item.querySelector('.acc-body');
@@ -558,7 +603,6 @@ function toggleAll(cls, open) {
     if (icon) icon.classList.toggle('open', open);
   });
 }
-
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -567,7 +611,6 @@ function switchTab(name) {
     if (b.getAttribute('onclick').includes(`'${name}'`)) b.classList.add('active');
   });
 }
-
 function filterTab(input, panelId) {
   const q = input.value.toLowerCase().trim();
   document.querySelectorAll(`#${panelId} .acc-item`).forEach(item => {
@@ -575,11 +618,8 @@ function filterTab(input, panelId) {
   });
 }
 
-// ── init ──────────────────────────────────────────────────────────────────────
+// ── run ───────────────────────────────────────────────────────────────────────
 loadAll();
-
-// Auto-refresh every 5 minutes
-setInterval(loadAll, 5 * 60 * 1000);
 </script>
 </body>
 </html>
